@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 다크 모드 설정 - 로컬 스토리지에서 상태 불러오기
     if (localStorage.getItem('darkMode') === 'enabled') {
         document.body.classList.add('dark-mode');
-        darkModeToggle.innerHTML = '<i class="fa-lightbulb"></i>';
+        darkModeToggle.innerHTML = '<i class="fa-sun"></i>';
     }
     
     // 슬라이드 및 썸네일 동적 생성
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('darkMode', 'disabled');
         } else {
             document.body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-lightbulb"></i>';
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             localStorage.setItem('darkMode', 'enabled');
         }
     }
