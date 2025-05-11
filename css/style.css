@@ -122,47 +122,15 @@ section h2 {
     background-color: var(--bg-color);
 }
 
-/* 슬라이드 컨트롤 스타일 */
-.slide-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1rem 0;
-    position: relative;
-    bottom: auto;
-}
-
-.slide-controls button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    padding: 0.5rem;
-    transition: color 0.3s;
-}
-
-.slide-controls button:hover {
-    color: var(--accent-color);
-}
-
-#slide-counter {
-    margin: 0 1rem;
-    font-size: 1rem;
-    color: var(--secondary-color);
-}
-
-/* 슬라이드 뷰어 스타일 */
+/* 슬라이드 뷰어 스타일 수정 */
 .slide-viewer {
     position: relative;
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 0 auto 1rem;
     overflow: hidden;
     border-radius: 8px;
     box-shadow: 0 4px 10px var(--shadow-color);
-    height: 75vh; /* 높이 제한 추가 */
 }
-
 
 .slides {
     display: flex;
@@ -178,8 +146,78 @@ section h2 {
     width: 100%;
     height: auto;
     display: block;
-    max-height: 70vh;
-    object-fit: contain;
+}
+
+/* 슬라이드 네비게이션 버튼 스타일 */
+.slide-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s, background-color 0.3s;
+    z-index: 10;
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+.slide-viewer:hover .slide-nav-btn {
+    opacity: 1;
+}
+
+.slide-nav-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* 슬라이드 컨트롤 스타일 */
+.slide-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.slide-controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    padding: 0.5rem;
+    transition: color 0.3s;
+}
+
+.slide-controls button:hover {
+    color: var(--accent-color);
+}
+
+#slide-counter {
+    margin: 0 1rem;
+    font-size: 1rem;
+    color: var(--secondary-color);
+}
+
+/* 다크 모드에서의 슬라이드 네비게이션 버튼 */
+.dark-mode .slide-nav-btn {
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #333;
+}
+
+.dark-mode .slide-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 /* 썸네일 갤러리 스타일 */
@@ -356,9 +394,10 @@ footer {
         height: 34px;
     }
     
-    .slide-controls button {
+    .slide-nav-btn {
+        width: 32px;
+        height: 32px;
         font-size: 1rem;
-        padding: 0.3rem;
     }
     
     #slide-counter {
