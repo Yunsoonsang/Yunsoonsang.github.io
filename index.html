@@ -4,9 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>구름 속 질서를 설계하는 엔지니어</title>
-    <meta name="description" content="Yunsoonsang Github Pages 사이트입니다.">
-    <!-- CSS -->
+    <meta name="description" content="Soonsang Yun의 포트폴리오 웹사이트입니다.">
+    <!-- 폰트 어썸 아이콘 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- CSS 연결 -->
     <link rel="stylesheet" href="css/style.css">
+    <!-- 주요 슬라이드 미리 로드 -->
+    <link rel="preload" href="images/slides/Slide_1.PNG" as="image">
 </head>
 <body>
     <!-- 헤더 섹션 -->
@@ -20,6 +24,10 @@
                     <li><a href="#contact">82+ 010-4657-0097</a></li>
                 </ul>
             </nav>
+            <!-- 다크 모드 토글 버튼 -->
+            <button id="dark-mode-toggle" aria-label="다크 모드 전환">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </header>
 
@@ -32,16 +40,22 @@
                 
                 <!-- 슬라이드 컨트롤 -->
                 <div class="slide-controls">
-                    <button id="prev-slide">이전</button>
+                    <button id="prev-slide" aria-label="이전 슬라이드"><i class="fas fa-chevron-left"></i></button>
                     <span id="slide-counter">1 / 21</span>
-                    <button id="next-slide">다음</button>
+                    <button id="next-slide" aria-label="다음 슬라이드"><i class="fas fa-chevron-right"></i></button>
+                    <button id="play-pause" aria-label="자동 재생 시작/중지"><i class="fas fa-play"></i></button>
                 </div>
                 
                 <!-- 슬라이드 뷰어 -->
-                <div class="slide-viewer">
+                <div class="slide-viewer" role="region" aria-label="슬라이드 프레젠테이션" aria-live="polite">
                     <div class="slides">
-                        <!-- Dynamic JavaScript -->
+                        <!-- 슬라이드는 JavaScript로 동적 생성됨 -->
                     </div>
+                </div>
+
+                <!-- 썸네일 갤러리 -->
+                <div class="thumbnail-gallery">
+                    <!-- 썸네일은 JavaScript로 동적 생성됨 -->
                 </div>
             </div>
         </section>
@@ -62,6 +76,11 @@
                 <h2>연락처</h2>
                 <div class="contact-info">
                     <p>이메일: your.email@example.com</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -74,7 +93,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript  -->
+    <!-- JavaScript -->
     <script src="js/script.js"></script>
 </body>
 </html>
