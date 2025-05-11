@@ -120,13 +120,13 @@ section h2 {
 /* 포트폴리오 섹션 스타일 */
 .portfolio-section {
     background-color: var(--bg-color);
-    padding-top: 3rem; /* 상단 패딩 줄임 (포트폴리오 제목 제거로 인해) */
+    padding-top: 3rem;
 }
 
 /* 슬라이드 뷰어 스타일 수정 */
 .slide-viewer {
     position: relative;
-    max-width: 1200px; /* 슬라이드 크기 증가 */
+    max-width: 1100px; 
     margin: 0 auto 1rem;
     overflow: hidden;
     border-radius: 8px;
@@ -189,6 +189,7 @@ section h2 {
     justify-content: center;
     align-items: center;
     margin-bottom: 1rem;
+    margin-top: 1rem;
 }
 
 #slide-counter {
