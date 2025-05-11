@@ -3,14 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // 슬라이드 관련 변수 설정
     const totalSlides = 21; // 슬라이드 총 개수
     let currentSlide = 1; // 현재 슬라이드 인덱스
-    let isPlaying = false; // 자동 재생 상태
-    let slideInterval; // 자동 재생 인터벌 변수
     
     // DOM 요소 선택
     const slidesContainer = document.querySelector('.slides');
     const prevButton = document.getElementById('prev-slide');
     const nextButton = document.getElementById('next-slide');
-    const playPauseButton = document.getElementById('play-pause');
     const slideCounter = document.getElementById('slide-counter');
     const thumbnailGallery = document.querySelector('.thumbnail-gallery');
     const darkModeToggle = document.getElementById('dark-mode-toggle');
@@ -44,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // 썸네일 클릭 이벤트
             thumbnail.addEventListener('click', function() {
                 goToSlide(parseInt(this.dataset.slide));
-                stopAutoPlay(); // 썸네일 클릭 시 자동 재생 중지
             });
         }
         
@@ -108,20 +104,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSlidePosition();
     }
     
-    // 자동 재생 시작
-    function startAutoPlay() {
-        isPlaying = true;
-        playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-        slideInterval = setInterval(nextSlide, 3000); // 3초마다 다음 슬라이드로 이동
-    }
-    
-    // 자동 재생 중지
-    function stopAutoPlay() {
-        isPlaying = false;
-        playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
-        clearInterval(slideInterval);
-    }
-    
     // 다크 모드 토글
     function toggleDarkMode() {
         if (document.body.classList.contains('dark-mode')) {
@@ -178,24 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // 이벤트 리스너 설정
-    prevButton.addEventListener('click', function() {
-        stopAutoPlay(); // 버튼 클릭 시 자동 재생 중지
-        prevSlide();
-    });
-    
-    nextButton.addEventListener('click', function() {
-        stopAutoPlay(); // 버튼 클릭 시 자동 재생 중지
-        nextSlide();
-    });
-    
-    playPauseButton.addEventListener('click', function() {
-        if (isPlaying) {
-            stopAutoPlay();
-        } else {
-            startAutoPlay();
-        }
-    });
-    
+    prevButton.addEventListener('click', prevSlide);
+    nextButton.addEventListener('click', nextSlide);
     darkModeToggle.addEventListener('click', toggleDarkMode);
     
     // 키보드 탐색
@@ -203,19 +169,9 @@ document.addEventListener('DOMContentLoaded', function() {
         switch(e.key) {
             case 'ArrowLeft':
                 prevSlide();
-                stopAutoPlay(); // 키보드 탐색 시 자동 재생 중지
                 break;
             case 'ArrowRight':
                 nextSlide();
-                stopAutoPlay(); // 키보드 탐색 시 자동 재생 중지
-                break;
-            case ' ':
-                if (isPlaying) {
-                    stopAutoPlay();
-                } else {
-                    startAutoPlay();
-                }
-                e.preventDefault(); // 스페이스바의 기본 동작(스크롤) 방지
                 break;
             case 'f':
                 startPresentationMode();
@@ -244,27 +200,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (touchEndX < touchStartX - swipeThreshold) {
             // 왼쪽으로 스와이프: 다음 슬라이드
-            stopAutoPlay(); // 스와이프 시 자동 재생 중지
             nextSlide();
         }
         
         if (touchEndX > touchStartX + swipeThreshold) {
             // 오른쪽으로 스와이프: 이전 슬라이드
-            stopAutoPlay(); // 스와이프 시 자동 재생 중지
             prevSlide();
         }
     }
-    
-    // 페이지 가시성 변경 시 자동 재생 제어
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden && isPlaying) {
-            // 페이지가 백그라운드로 전환될 때 자동 재생 중지
-            clearInterval(slideInterval);
-        } else if (!document.hidden && isPlaying) {
-            // 페이지가 포그라운드로 전환될 때 자동 재생 재개
-            slideInterval = setInterval(nextSlide, 3000);
-        }
-    });
     
     // 이미지 지연 로딩 설정
     const lazyLoadImages = function() {
