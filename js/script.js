@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('darkMode', 'disabled');
         } else {
             document.body.classList.add('dark-mode');
-            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            darkModeToggle.innerHTML = '<i class="fas fa-lightbulb"></i>';
             localStorage.setItem('darkMode', 'enabled');
         }
     }
