@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextButton = document.getElementById('next-slide');
     const slideCounter = document.getElementById('slide-counter');
     const thumbnailGallery = document.querySelector('.thumbnail-gallery');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    
+    // 다크 모드 설정 - 로컬 스토리지에서 상태 불러오기
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        document.body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
     
     // 슬라이드 및 썸네일 동적 생성
     function initializeSlides() {
@@ -97,6 +104,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSlidePosition();
     }
     
+    // 다크 모드 토글
+    function toggleDarkMode() {
+        if (document.body.classList.contains('dark-mode')) {
+            document.body.classList.remove('dark-mode');
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', 'disabled');
+        } else {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem('darkMode', 'enabled');
+        }
+    }
+    
     // 프레젠테이션 모드 시작
     function startPresentationMode() {
         // 프레젠테이션 모드 컨테이너 생성
@@ -142,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 이벤트 리스너 설정
     prevButton.addEventListener('click', prevSlide);
     nextButton.addEventListener('click', nextSlide);
+    darkModeToggle.addEventListener('click', toggleDarkMode);
     
     // 키보드 탐색
     document.addEventListener('keydown', function(e) {

@@ -1,4 +1,4 @@
-/* 색상 변수 정의 */
+/* 색상 변수 정의 - 다크 모드를 위한 설정 */
 :root {
     /* 라이트 모드 색상 변수 */
     --bg-color: #f8f9fa;
@@ -10,6 +10,19 @@
     --card-bg: #ffffff;
     --border-color: #dee2e6;
     --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 다크 모드 색상 변수 */
+.dark-mode {
+    --bg-color: #212529;
+    --text-color: #f8f9fa;
+    --primary-color: #adb5bd;
+    --secondary-color: #6c757d;
+    --accent-color: #ced4da;
+    --header-bg: #343a40;
+    --card-bg: #343a40;
+    --border-color: #495057;
+    --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
 /* 기본 리셋 및 글꼴 설정 */
@@ -24,6 +37,7 @@ body {
     line-height: 1.6;
     color: var(--text-color);
     background-color: var(--bg-color);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* 컨테이너 스타일 */
@@ -82,16 +96,19 @@ nav ul li a:hover {
     color: var(--accent-color);
 }
 
-/* 자격증 뱃지 스타일 */
-.badges-container {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+/* 다크 모드 토글 버튼 */
+#dark-mode-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-left: 1rem;
+    transition: color 0.3s;
 }
 
-.badge-item {
-    transform: scale(0.7); /* 뱃지 크기 조정 */
-    transform-origin: right top;
+#dark-mode-toggle:hover {
+    color: var(--accent-color);
 }
 
 /* 섹션 공통 스타일 */
@@ -188,6 +205,16 @@ section h2 {
 #slide-counter {
     font-size: 1rem;
     color: var(--secondary-color);
+}
+
+/* 다크 모드에서의 슬라이드 네비게이션 버튼 */
+.dark-mode .slide-nav-btn {
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #333;
+}
+
+.dark-mode .slide-nav-btn:hover {
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 /* 썸네일 갤러리 스타일 */
@@ -338,8 +365,10 @@ footer {
         height: 40px;
     }
     
-    .badges-container {
-        margin: 1rem 0;
+    #dark-mode-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
     }
 }
 
@@ -370,11 +399,6 @@ footer {
     
     .thumbnail-gallery {
         gap: 5px;
-    }
-    
-    .badges-container {
-        flex-direction: column;
-        align-items: flex-end;
     }
 }
 
