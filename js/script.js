@@ -1,8 +1,9 @@
 // DOM이 완전히 로드된 후 스크립트 실행
 document.addEventListener('DOMContentLoaded', function() {
     // 슬라이드 관련 변수 설정
-    const totalSlides = 21; // 슬라이드 총 개수
+    let totalSlides = 0; // 실제 존재하는 슬라이드 개수 (동적으로 결정)
     let currentSlide = 1; // 현재 슬라이드 인덱스
+    const maxSlidesToCheck = 30; // 확인할 최대 슬라이드 번호
     
     // DOM 요소 선택
     const slidesContainer = document.querySelector('.slides');
@@ -11,34 +12,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const slideCounter = document.getElementById('slide-counter');
     const thumbnailGallery = document.querySelector('.thumbnail-gallery');
     
+    // 이미지 존재 여부 확인 함수
+    function checkImageExists(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = url;
+        });
+    }
+    
     // 슬라이드 및 썸네일 동적 생성
-    function initializeSlides() {
+    async function initializeSlides() {
+        // 먼저 존재하는 슬라이드 개수 확인
+        const existingSlides = [];
+        
+        for (let i = 1; i <= maxSlidesToCheck; i++) {
+            const imageUrl = `images/slides/Slide_${i}.PNG`;
+            const exists = await checkImageExists(imageUrl);
+            
+            if (exists) {
+                existingSlides.push(i);
+            } else if (existingSlides.length > 0 && i > existingSlides[existingSlides.length - 1] + 2) {
+                // 연속으로 2개 이상 없으면 종료 (중간에 빠진 슬라이드 허용)
+                break;
+            }
+        }
+        
+        totalSlides = existingSlides.length;
+        
+        if (totalSlides === 0) {
+            console.error('슬라이드 이미지를 찾을 수 없습니다.');
+            slideCounter.textContent = '슬라이드를 찾을 수 없습니다';
+            return;
+        }
+        
+        console.log(`총 ${totalSlides}개의 슬라이드를 찾았습니다.`);
+        
         // 슬라이드 생성
-        for (let i = 1; i <= totalSlides; i++) {
+        existingSlides.forEach((slideNum, index) => {
             const slide = document.createElement('div');
             slide.className = 'slide';
             slide.setAttribute('role', 'group');
-            slide.setAttribute('aria-label', `슬라이드 ${i} / ${totalSlides}`);
-            slide.setAttribute('aria-hidden', i === 1 ? 'false' : 'true');
-            // Slide_1.PNG 형식의 이미지 파일 사용
-            slide.innerHTML = `<img src="images/slides/Slide_${i}.PNG" alt="슬라이드 ${i}" loading="${i <= 3 ? 'eager' : 'lazy'}">`;
+            slide.setAttribute('aria-label', `슬라이드 ${index + 1} / ${totalSlides}`);
+            slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
+            slide.innerHTML = `<img src="images/slides/Slide_${slideNum}.PNG" alt="슬라이드 ${index + 1}" loading="${index < 3 ? 'eager' : 'lazy'}">`;
             slidesContainer.appendChild(slide);
             
             // 썸네일 생성
             const thumbnail = document.createElement('div');
-            thumbnail.className = i === 1 ? 'thumbnail active' : 'thumbnail';
-            thumbnail.innerHTML = `<img src="images/slides/Slide_${i}.PNG" alt="썸네일 ${i}">`;
-            thumbnail.dataset.slide = i;
+            thumbnail.className = index === 0 ? 'thumbnail active' : 'thumbnail';
+            thumbnail.innerHTML = `<img src="images/slides/Slide_${slideNum}.PNG" alt="썸네일 ${index + 1}">`;
+            thumbnail.dataset.slide = index + 1;
             thumbnailGallery.appendChild(thumbnail);
             
             // 썸네일 클릭 이벤트
             thumbnail.addEventListener('click', function() {
                 goToSlide(parseInt(this.dataset.slide));
             });
-        }
+        });
         
         // 초기 슬라이드 위치 설정
         updateSlidePosition();
+        
+        // 버튼 활성화
+        prevButton.disabled = false;
+        nextButton.disabled = false;
     }
     
     // 슬라이드 위치 업데이트
