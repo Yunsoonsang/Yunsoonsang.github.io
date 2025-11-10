@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const prevButton = document.getElementById('prev-slide');
     const nextButton = document.getElementById('next-slide');
     const slideCounter = document.getElementById('slide-counter');
-    const thumbnailGallery = document.querySelector('.thumbnail-gallery');
+    const slideViewer = document.querySelector('.slide-viewer');
     
     // 이미지 존재 여부 확인 함수
     function checkImageExists(url) {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // 슬라이드 및 썸네일 동적 생성
+    // 슬라이드 동적 생성
     async function initializeSlides() {
         // 먼저 존재하는 슬라이드 개수 확인
         const existingSlides = [];
@@ -58,19 +58,13 @@ document.addEventListener('DOMContentLoaded', function() {
             slide.setAttribute('aria-hidden', index === 0 ? 'false' : 'true');
             slide.innerHTML = `<img src="images/slides/Slide_${slideNum}.PNG" alt="슬라이드 ${index + 1}" loading="${index < 3 ? 'eager' : 'lazy'}">`;
             slidesContainer.appendChild(slide);
-            
-            // 썸네일 생성
-            const thumbnail = document.createElement('div');
-            thumbnail.className = index === 0 ? 'thumbnail active' : 'thumbnail';
-            thumbnail.innerHTML = `<img src="images/slides/Slide_${slideNum}.PNG" alt="썸네일 ${index + 1}">`;
-            thumbnail.dataset.slide = index + 1;
-            thumbnailGallery.appendChild(thumbnail);
-            
-            // 썸네일 클릭 이벤트
-            thumbnail.addEventListener('click', function() {
-                goToSlide(parseInt(this.dataset.slide));
-            });
         });
+        
+        // 확대 힌트 추가
+        const zoomHint = document.createElement('div');
+        zoomHint.className = 'zoom-hint';
+        zoomHint.textContent = '클릭하여 확대';
+        slideViewer.appendChild(zoomHint);
         
         // 초기 슬라이드 위치 설정
         updateSlidePosition();
@@ -91,21 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 slide.setAttribute('aria-hidden', 'false');
             } else {
                 slide.setAttribute('aria-hidden', 'true');
-            }
-        });
-        
-        // 썸네일 활성화 상태 업데이트
-        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
-            if (index + 1 === currentSlide) {
-                thumb.classList.add('active');
-                // 활성화된 썸네일에 애니메이션 적용
-                thumb.classList.add('fade-in');
-                // 애니메이션이 끝나면 클래스 제거
-                setTimeout(() => {
-                    thumb.classList.remove('fade-in');
-                }, 500);
-            } else {
-                thumb.classList.remove('active');
             }
         });
     }
@@ -136,79 +115,148 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSlidePosition();
     }
     
-    // 프레젠테이션 모드 시작
-    function startPresentationMode() {
-        // 프레젠테이션 모드 컨테이너 생성
-        const presentationContainer = document.createElement('div');
-        presentationContainer.className = 'presentation-mode';
+    // 전체화면 모달 열기
+    function openFullscreenModal() {
+        // 모달 컨테이너 생성
+        const modal = document.createElement('div');
+        modal.className = 'fullscreen-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', '슬라이드 전체화면');
         
         // 슬라이드 뷰어 복제
-        const slideViewerClone = document.querySelector('.slide-viewer').cloneNode(true);
+        const slideViewerClone = slideViewer.cloneNode(true);
+        
+        // 확대 힌트 제거
+        const hintInClone = slideViewerClone.querySelector('.zoom-hint');
+        if (hintInClone) {
+            hintInClone.remove();
+        }
+        
+        // 슬라이드 컨트롤 복제
         const slideControlsClone = document.querySelector('.slide-controls').cloneNode(true);
         
-        // 프레젠테이션 모드에 요소 추가
-        presentationContainer.appendChild(slideViewerClone);
-        presentationContainer.appendChild(slideControlsClone);
-        
-        // 닫기 버튼 추가
+        // 닫기 버튼 생성
         const closeButton = document.createElement('button');
+        closeButton.className = 'close-modal';
         closeButton.innerHTML = '<i class="fas fa-times"></i>';
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '20px';
-        closeButton.style.right = '20px';
-        closeButton.style.color = 'white';
-        closeButton.style.fontSize = '2rem';
-        closeButton.style.background = 'none';
-        closeButton.style.border = 'none';
-        closeButton.style.cursor = 'pointer';
+        closeButton.setAttribute('aria-label', '전체화면 닫기');
         
-        closeButton.addEventListener('click', function() {
-            document.body.removeChild(presentationContainer);
+        // 모달에 요소 추가
+        modal.appendChild(closeButton);
+        modal.appendChild(slideViewerClone);
+        modal.appendChild(slideControlsClone);
+        
+        document.body.appendChild(modal);
+        
+        // body 스크롤 방지
+        document.body.style.overflow = 'hidden';
+        
+        // 복제된 슬라이드를 현재 위치로 이동
+        const clonedSlidesContainer = slideViewerClone.querySelector('.slides');
+        clonedSlidesContainer.style.transform = `translateX(-${(currentSlide - 1) * 100}%)`;
+        
+        // 복제된 버튼에 이벤트 리스너 추가
+        const clonedPrevBtn = slideViewerClone.querySelector('#prev-slide');
+        const clonedNextBtn = slideViewerClone.querySelector('#next-slide');
+        const clonedCounter = slideControlsClone.querySelector('#slide-counter');
+        
+        // 모달 내부 슬라이드 업데이트 함수
+        function updateModalSlide() {
+            clonedSlidesContainer.style.transform = `translateX(-${(currentSlide - 1) * 100}%)`;
+            clonedCounter.textContent = `${currentSlide} / ${totalSlides}`;
+            // 메인 슬라이드도 동기화
+            updateSlidePosition();
+        }
+        
+        clonedPrevBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            prevSlide();
+            updateModalSlide();
         });
         
-        presentationContainer.appendChild(closeButton);
-        document.body.appendChild(presentationContainer);
+        clonedNextBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            nextSlide();
+            updateModalSlide();
+        });
         
-        // ESC 키로 프레젠테이션 모드 종료
-        document.addEventListener('keydown', function escKeyHandler(e) {
-            if (e.key === 'Escape') {
-                document.body.removeChild(presentationContainer);
-                document.removeEventListener('keydown', escKeyHandler);
+        // 닫기 버튼 이벤트
+        closeButton.addEventListener('click', closeModal);
+        
+        // 배경 클릭 시 닫기
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
             }
         });
+        
+        // ESC 키로 닫기
+        function handleEscKey(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+                updateModalSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+                updateModalSlide();
+            }
+        }
+        
+        document.addEventListener('keydown', handleEscKey);
+        
+        // 모달 닫기 함수
+        function closeModal() {
+            document.body.removeChild(modal);
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', handleEscKey);
+        }
     }
     
     // 이벤트 리스너 설정
-    prevButton.addEventListener('click', prevSlide);
-    nextButton.addEventListener('click', nextSlide);
+    prevButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        prevSlide();
+    });
     
-    // 키보드 탐색
-    document.addEventListener('keydown', function(e) {
-        switch(e.key) {
-            case 'ArrowLeft':
-                prevSlide();
-                break;
-            case 'ArrowRight':
-                nextSlide();
-                break;
-            case 'f':
-                startPresentationMode();
-                break;
+    nextButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        nextSlide();
+    });
+    
+    // 슬라이드 뷰어 클릭 시 전체화면 모달 열기
+    slideViewer.addEventListener('click', function(e) {
+        // 버튼 클릭은 제외
+        if (!e.target.closest('.slide-nav-btn')) {
+            openFullscreenModal();
         }
     });
     
-    // 더블클릭으로 프레젠테이션 모드 시작
-    slidesContainer.addEventListener('dblclick', startPresentationMode);
+    // 키보드 탐색
+    document.addEventListener('keydown', function(e) {
+        // 모달이 열려있지 않을 때만 작동
+        if (!document.querySelector('.fullscreen-modal')) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    prevSlide();
+                    break;
+                case 'ArrowRight':
+                    nextSlide();
+                    break;
+            }
+        }
+    });
     
     // 스와이프 제스처 지원 (모바일용)
     let touchStartX = 0;
     let touchEndX = 0;
     
-    slidesContainer.addEventListener('touchstart', function(e) {
+    slideViewer.addEventListener('touchstart', function(e) {
         touchStartX = e.changedTouches[0].screenX;
     });
     
-    slidesContainer.addEventListener('touchend', function(e) {
+    slideViewer.addEventListener('touchend', function(e) {
         touchEndX = e.changedTouches[0].screenX;
         handleSwipe();
     });
